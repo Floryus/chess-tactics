@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import "./globals.css";
 
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, useUser } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const lexend = Lexend({ subsets: ["latin"] });
 
@@ -25,7 +27,9 @@ export default function RootLayout({
           <header className="max-w p-4">
             <Navbar />
           </header>
-          <div className="max-w mx-auto flex-grow">{children}</div>
+          <div className="max-w mx-auto flex  justify-center items-center">
+            {children}
+          </div>
           <footer className="max-w p-4 mt-auto">
             <Footer />
           </footer>
