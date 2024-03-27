@@ -1,15 +1,15 @@
-import exp from "constants"
 import Link from "next/link";
 
 const Footer = () => {
 
     return(
-        <footer>
-        <Link href="https://github.com/Floryus/chess-tactics">
-            <span style={{ fontFamily: 'Apple Color Emoji' }}>👾</span>
-            GitHub
-        </Link>
-        <Link href="/Impressum">Impressum</Link>
+        <footer className="flex justify-between">
+            <Link href="https://github.com/Floryus/chess-tactics">
+                <span className="emoji">👾</span> GitHub
+            </Link>
+            <Link href="/Impressum">
+                <span className="emoji">📩</span> Impressum
+            </Link>
         </footer>
     )
 

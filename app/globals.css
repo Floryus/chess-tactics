@@ -18,6 +18,10 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.emoji {
+  font-family: "Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, Segoe UI Symbol, Android Emoji, EmojiSymbols" ;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
