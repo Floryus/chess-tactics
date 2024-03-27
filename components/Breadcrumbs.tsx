@@ -13,20 +13,14 @@ const Breadcrumbs = () => {
 
   const breadcrumbs: BreadcrumbItem[] = parts.map((part, index) => ({
     title: part.charAt(0).toUpperCase() + part.slice(1),
-    href: index === 0 ? "/" : `/${parts.slice(0, index + 1).join("/")}`,
+    href: index === 0 ? "/home" : `/${parts.slice(0, index + 1).join("/")}`,
   }));
 
   return (
-    <nav className="pr-4 flex items-center ">
+    <nav className="ml-2 flex items-center ">
       {breadcrumbs.map((crumb, index) => (
         <Link key={index} href={crumb.href}>
-          {index + 1 === breadcrumbs.length ? ( // Last item - don't add ">"
-            crumb.title
-          ) : (
-            <>
-              {crumb.title} {'>'}
-            </>
-          )}
+              {' >'} {crumb.title}
         </Link>
       ))}
     </nav>
