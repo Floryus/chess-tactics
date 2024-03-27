@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const Navbar = () => {
   return (
-    <nav className="p-4 flex flex-row items-center justify-between">
+    <nav className=" flex flex-row items-center justify-between">
       {/* Title and Logo */}
       <div className="flex">
         <Image
@@ -17,7 +17,7 @@ const Navbar = () => {
         />
         <div className="flex flex-col">
           <div className="flex items-center">
-            <div className="text-xl text-white">Chess Tactics</div>
+            <div className="text-3xl text-white underline">Chess Tactics</div>
           </div>
           <Breadcrumbs />
         </div>

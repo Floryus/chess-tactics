@@ -11,7 +11,8 @@ const Breadcrumbs = () => {
   });
 
   return (
-    <nav className="px-4 flex items-center ">
+    <nav className="pr-4 flex items-center ">
+      <Link href="/">Home</Link>
       {parts.map((part, index) => {
         return (
           <Link key={index} href={`/${part.toLowerCase()}`}>

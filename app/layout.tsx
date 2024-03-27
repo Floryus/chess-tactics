@@ -20,9 +20,15 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={lexend.className}>
-          <Navbar />
-          {children}
+        <body className={lexend.className + " flex flex-col min-h-screen"}>
+          <header className="max-w p-4">
+            <Navbar />
+          </header>
+          <div className="max-w mx-auto flex-grow">{children}</div>
+          <footer className="max-w p-4 mt-auto">
+            <p>© {new Date().getFullYear()} Chess Tactics</p>
+            <p>GitHub</p>
+          </footer>
         </body>
       </html>
     </ClerkProvider>
