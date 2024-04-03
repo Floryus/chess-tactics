@@ -15,7 +15,7 @@ const Breadcrumbs = () => {
       {parts.map((part, index) => {
         return (
           <Link key={index} href={`/${part.toLowerCase()}`}>
-            &gt; {part}
+            {index === 0 ? part + " " : " > " + part}
           </Link>
         );
       })}
