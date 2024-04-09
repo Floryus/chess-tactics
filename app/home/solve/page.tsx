@@ -28,7 +28,7 @@ export default function Solve() {
 
     updateWidth();
 
-    if (typeof window !== "undefined") {
+    if (window !== undefined) {
       window.addEventListener("resize", updateWidth);
 
       return () => {
@@ -57,7 +57,7 @@ export default function Solve() {
 
       <div className="flex justify-center items-center border border-gray-300 row-span-3">
         <div ref={divRef} style={{ width: "100%", height: "100%" }}>
-          {typeof window !== "undefined" ? <Chessboard width={width} /> : <></>}
+          {window !== undefined ? <Chessboard width={width} /> : <></>}
         </div>
       </div>
 
