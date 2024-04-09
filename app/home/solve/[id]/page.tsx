@@ -1,16 +1,20 @@
 "use client";
 
 import { loadTactic } from "@/app/http";
+import { Tactic } from "@/app/types";
 import Button from "@/components/Button";
 import Chessboard from "chessboardjsx";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Solve({ params }: { params: { id: string } }) {
   const time = new Date().toLocaleTimeString();
-  console.log(params.id);
+
+  const [data, setData] = useState<Tactic>();
 
   useEffect(() => {
-    loadTactic(params.id);
+    const res = loadTactic(params.id);
+    console.log(res);
+    res.then((data) => setData(data));
   }, []);
 
   function showSolution() {
@@ -49,7 +53,7 @@ export default function Solve({ params }: { params: { id: string } }) {
   return (
     <main className="grid grid-cols-3 border border-gray-300 m-10">
       <div className="flex justify-center items-center border border-gray-300">
-        <div className="p-2">#629186</div>
+        <div className="p-2">{data?.id}</div>
       </div>
 
       <div className="flex justify-center items-center border border-gray-300">
@@ -57,7 +61,7 @@ export default function Solve({ params }: { params: { id: string } }) {
       </div>
 
       <div className="flex justify-center items-center border border-gray-300">
-        <div className="p-2">{time}</div>
+        <div className="p-2">{data?.created_at}</div>
       </div>
 
       <div className="flex justify-center items-center border border-gray-300">
