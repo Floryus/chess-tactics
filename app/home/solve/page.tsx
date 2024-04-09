@@ -4,8 +4,6 @@ import Button from "@/components/Button";
 import Chessboard from "chessboardjsx";
 import { useEffect, useRef, useState } from "react";
 
-import dynamic from "next/dynamic";
-
 export default function Solve() {
   const time = new Date().toLocaleTimeString();
 
@@ -59,7 +57,7 @@ export default function Solve() {
 
       <div className="flex justify-center items-center border border-gray-300 row-span-3">
         <div ref={divRef} style={{ width: "100%", height: "100%" }}>
-          <Chessboard width={width} />
+          {typeof window !== "undefined" ? <Chessboard width={width} /> : <></>}
         </div>
       </div>
 
