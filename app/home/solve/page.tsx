@@ -1,9 +1,10 @@
 "use client";
 
 import Button from "@/components/Button";
-import HomeChessboard from "@/components/HomeChessboard";
 import Chessboard from "chessboardjsx";
 import { useEffect, useRef, useState } from "react";
+
+import dynamic from "next/dynamic";
 
 export default function Solve() {
   const time = new Date().toLocaleTimeString();
@@ -29,11 +30,13 @@ export default function Solve() {
 
     updateWidth();
 
-    window.addEventListener("resize", updateWidth);
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", updateWidth);
 
-    return () => {
-      window.removeEventListener("resize", updateWidth);
-    };
+      return () => {
+        window.removeEventListener("resize", updateWidth);
+      };
+    }
   }, []);
 
   return (
