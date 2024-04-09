@@ -25,7 +25,7 @@ const Navbar = () => {
 
       <div className="text-white">
         <SignedIn>
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
         </SignedIn>
         <SignedOut>
           <Link href="/login">Sign in</Link>

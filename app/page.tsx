@@ -2,19 +2,17 @@
 
 import Button from "@/components/Button";
 import HomeChessboard from "@/components/HomeChessboard";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
 
-  const { user } = useUser();
+  const { isLoaded, userId, sessionId, getToken } = useAuth();
   useEffect(() => {
-    console.log("now");
-    console.log(user);
-    if (user) {
-      router.push("/home");
+    if (isLoaded && userId && sessionId) {
+      router.push("/home/");
     }
   }, []);
 
