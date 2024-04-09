@@ -2,7 +2,7 @@
 
 import Button from "@/components/Button";
 import Chessboard from "chessboardjsx";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function Solve() {
   const time = new Date().toLocaleTimeString();
@@ -37,6 +37,9 @@ export default function Solve() {
     }
   }, []);
 
+  // Dynamic import for Chessboard component
+  const Chessboard = React.lazy(() => import("chessboardjsx"));
+
   return (
     <main className="grid grid-cols-3 border border-gray-300 m-10">
       <div className="flex justify-center items-center border border-gray-300">
@@ -57,7 +60,12 @@ export default function Solve() {
 
       <div className="flex justify-center items-center border border-gray-300 row-span-3">
         <div ref={divRef} style={{ width: "100%", height: "100%" }}>
-          {window !== undefined ? <Chessboard width={width} /> : <></>}
+          {/* Conditional rendering of Chessboard component */}
+          {typeof window !== "undefined" && (
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <Chessboard width={width} />
+            </React.Suspense>
+          )}
         </div>
       </div>
 
