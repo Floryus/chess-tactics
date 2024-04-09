@@ -1,4 +1,7 @@
-import Chessboard from "chessboardjsx";
+import React from "react";
+
+// Dynamic import for Chessboard component
+const Chessboard = React.lazy(() => import("chessboardjsx"));
 
 const HomeChessboard = () => {
   const calcWidth = ({ screenWidth, screenHeight }: any) => {
@@ -7,7 +10,11 @@ const HomeChessboard = () => {
 
   return (
     <div className="p-4">
-      <Chessboard position="start" calcWidth={calcWidth} />
+      {typeof window !== "undefined" && (
+        <React.Suspense fallback={<div>Loading...</div>}>
+          <Chessboard position="start" calcWidth={calcWidth} />
+        </React.Suspense>
+      )}
     </div>
   );
 };
