@@ -2,6 +2,8 @@
 
 import Button from "@/components/Button";
 import HomeChessboard from "@/components/HomeChessboard";
+import Chessboard from "chessboardjsx";
+import { useEffect, useRef, useState } from "react";
 
 export default function Solve() {
   const time = new Date().toLocaleTimeString();
@@ -14,8 +16,28 @@ export default function Solve() {
     console.log("show next puzzle");
   }
 
+  const [width, setWidth] = useState(0);
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (divRef.current) {
+        const newWidth = divRef.current.offsetWidth;
+        setWidth(newWidth);
+      }
+    };
+
+    updateWidth();
+
+    window.addEventListener("resize", updateWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateWidth);
+    };
+  }, []);
+
   return (
-    <div className="grid grid-cols-3 border border-gray-300 m-10">
+    <main className="grid grid-cols-3 border border-gray-300 m-10">
       <div className="flex justify-center items-center border border-gray-300">
         <div className="p-2">#629186</div>
       </div>
@@ -33,8 +55,8 @@ export default function Solve() {
       </div>
 
       <div className="flex justify-center items-center border border-gray-300 row-span-3">
-        <div>
-          <HomeChessboard></HomeChessboard>
+        <div ref={divRef} style={{ width: "100%", height: "100%" }}>
+          <Chessboard width={width} />
         </div>
       </div>
 
@@ -52,11 +74,7 @@ export default function Solve() {
 
       <div className="flex justify-center items-center border border-gray-300">
         <div className="m-4">
-          <Button
-            text="Show me the solution"
-            action={showSolution}
-            width={28}
-          ></Button>
+          <Button text="Show me the solution" action={showSolution} />
         </div>
       </div>
 
@@ -73,6 +91,6 @@ export default function Solve() {
           <button onClick={showNextPuzzle}> Next &gt;</button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
