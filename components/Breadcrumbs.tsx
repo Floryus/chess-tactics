@@ -17,12 +17,15 @@ const Breadcrumbs = () => {
   }));
 
   return (
-    <nav className="ml-2 flex items-center ">
-      {breadcrumbs.map((crumb, index) => (
-        <Link key={index} href={crumb.href}>
-              {' >'} {crumb.title}
-        </Link>
-      ))}
+
+    <nav className="pr-4 flex items-center ">
+      {parts.map((part, index) => {
+        return (
+          <Link key={index} href={`/${part.toLowerCase()}`}>
+            {index === 0 ? part + " " : " > " + part}
+          </Link>
+        );
+      })}
     </nav>
   );
 };

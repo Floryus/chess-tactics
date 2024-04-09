@@ -5,8 +5,7 @@ import "./globals.css";
 import { ClerkProvider, useUser } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { dark } from "@clerk/themes";
 
 const lexend = Lexend({ subsets: ["latin"] });
 
@@ -21,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
         <body className={lexend.className + " flex flex-col min-h-screen"}>
           <header className="max-w p-4">
