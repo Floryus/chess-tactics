@@ -1,5 +1,6 @@
 "use client";
 
+import { loadTactic } from "@/app/http";
 import Button from "@/components/Button";
 import Chessboard from "chessboardjsx";
 import React, { useEffect, useRef, useState } from "react";
@@ -7,6 +8,10 @@ import React, { useEffect, useRef, useState } from "react";
 export default function Solve({ params }: { params: { id: string } }) {
   const time = new Date().toLocaleTimeString();
   console.log(params.id);
+
+  useEffect(() => {
+    loadTactic(params.id);
+  }, []);
 
   function showSolution() {
     console.log("show solution");
