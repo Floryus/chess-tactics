@@ -6,13 +6,15 @@ import Image from "next/image";
 const Navbar = () => {
   return (
     <nav className=" flex flex-row items-center justify-between">
+      {/* Title and Logo */}
       <div className="flex">
-        <div className="flex items-baseline">
-          
-          <Link href={"/"} style={{fontSize:"36px"}}>
-            <span className="emoji">♟️</span>
-            <span style={{textDecoration:"underline"}}>Chess Tactics</span>
-            </Link>
+        <Link href={"/"} style={{ fontSize: "36px" }}>
+          <span className="emoji">♟️</span>
+        </Link>
+        <div className="flex flex-col">
+          <div className="flex items-center">
+            <div className="text-3xl text-white underline">Chess Tactics</div>
+          </div>
           <Breadcrumbs />
         </div>
       </div>
