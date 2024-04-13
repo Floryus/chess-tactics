@@ -11,9 +11,12 @@ const Breadcrumbs = () => {
     <nav className="pr-4 flex items-center ">
       {parts.map((part, index) => {
         return (
-          <Link key={index} href={`/${part.toLowerCase()}`}>
-            {index === 0 ? part + " " : " > " + part}
-          </Link>
+          <>
+            {index === 0 ? <></> : <div className="px-2">{" > "}</div>}
+            <Link key={index} href={`/${part.toLowerCase()}`}>
+              {part}
+            </Link>
+          </>
         );
       })}
     </nav>

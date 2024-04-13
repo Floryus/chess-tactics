@@ -3,6 +3,7 @@
 import { loadTactic } from "@/app/http";
 import { Tactic } from "@/app/types";
 import Button from "@/components/Button";
+import FadingText from "@/components/FadingText";
 import SolveChessboard from "@/components/SolveChessboard";
 import { Chess } from "chess.js";
 import React, { useEffect, useRef, useState } from "react";
@@ -11,18 +12,22 @@ export default function Solve({ params }: { params: { id: string } }) {
   const [data, setData] = useState<Tactic>();
   const [game, setGame] = useState<Chess>();
 
+  const [currentFen, setCurrentFen] = useState<string>("");
+  const [solved, setSolved] = useState(false);
+
   const [tries, setTries] = useState(0);
   const [seconds, setSeconds] = useState(0);
-
-  const [currentFen, setCurrentFen] = useState<string>("");
+  const [fadingText, setFadingText] = useState(0);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setSeconds((prevSeconds) => prevSeconds + 1);
-    }, 1000);
+    if (!solved) {
+      const intervalId = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+      return () => clearInterval(intervalId);
+    }
+  }, [solved]);
 
   useEffect(() => {
     const res = loadTactic(params.id);
@@ -35,8 +40,16 @@ export default function Solve({ params }: { params: { id: string } }) {
     setCurrentFen(currGame.fen());
   }, []);
 
+  useEffect(() => {
+    setFadingText(tries);
+  }, [tries]);
+
   function showSolution() {
-    console.log("show solution");
+    setSolved(true);
+    if (!data) {
+      return;
+    }
+    setCurrentFen(data?.answerFen);
   }
 
   function showNextPuzzle() {
@@ -79,6 +92,7 @@ export default function Solve({ params }: { params: { id: string } }) {
       if (game.fen() == data.answerFen) {
         console.log("Correct move", game.fen());
         setCurrentFen(game.fen());
+        setSolved(true);
       } else {
         console.log("Incorrect move");
         setGame(new Chess(data.questionFen));
@@ -113,6 +127,7 @@ export default function Solve({ params }: { params: { id: string } }) {
           {/* Conditional rendering of Chessboard component */}
           {typeof window !== "undefined" && (
             <SolveChessboard
+              solved={solved}
               width={width}
               currentFen={currentFen}
               onDrop={onDrop}
@@ -135,7 +150,22 @@ export default function Solve({ params }: { params: { id: string } }) {
 
       <div className="flex justify-center items-center border border-gray-300">
         <div className="m-4">
-          <Button width={2} text="Show me the solution" action={showSolution} />
+          {solved ? (
+            <div className={` mx-auto  border border-gray-500 py-2 px-2 `}>
+              <button className="text-xl items-center flex justify-center text-gray-500 cursor-not-allowed">
+                Show me the solution
+              </button>
+            </div>
+          ) : (
+            <div className={` mx-auto  border border-gray-300 py-2 px-2 `}>
+              <button
+                className="text-xl items-center flex justify-center "
+                onClick={showSolution}
+              >
+                Show me the solution
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -144,7 +174,14 @@ export default function Solve({ params }: { params: { id: string } }) {
       </div>
 
       <div className="flex justify-center items-center border border-gray-300">
-        <div className="p-2">This was incorrect!</div>
+        <div className="p-2">
+          {fadingText > 0 ? (
+            <FadingText tries={tries} text={"This was incorrect!"} />
+          ) : (
+            <></>
+          )}
+          {solved ? <>Correct!</> : <></>}
+        </div>
       </div>
 
       <div className="flex justify-center items-center border border-gray-300">

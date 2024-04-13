@@ -6,6 +6,7 @@ interface SolveChessboardProps {
   width: number;
   currentFen: string;
   onDrop: any;
+  solved: boolean;
 }
 
 // Dynamic import for Chessboard component
@@ -15,10 +16,16 @@ export default function SolveChessboard({
   width,
   currentFen,
   onDrop,
+  solved,
 }: SolveChessboardProps) {
   return (
     <React.Suspense fallback={<div>Loading...</div>}>
-      <Chessboard width={width} position={currentFen} onDrop={onDrop} />
+      <Chessboard
+        draggable={!solved}
+        width={width}
+        position={currentFen}
+        onDrop={onDrop}
+      />
     </React.Suspense>
   );
 }
