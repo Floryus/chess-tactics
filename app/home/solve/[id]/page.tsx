@@ -3,9 +3,8 @@
 import { loadTactic } from "@/app/http";
 import { Tactic } from "@/app/types";
 import Button from "@/components/Button";
-import Timer from "@/components/Timer";
+import SolveChessboard from "@/components/SolveChessboard";
 import { Chess } from "chess.js";
-import Chessboard from "chessboardjsx";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Solve({ params }: { params: { id: string } }) {
@@ -13,13 +12,27 @@ export default function Solve({ params }: { params: { id: string } }) {
   const [game, setGame] = useState<Chess>();
 
   const [tries, setTries] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+
+  const [currentFen, setCurrentFen] = useState<string>("");
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setSeconds((prevSeconds) => prevSeconds + 1);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     const res = loadTactic(params.id);
     console.log(res);
     res.then((data) => setData(data));
 
-    setGame(new Chess());
+    const currGame = new Chess(data?.questionFen);
+    console.log("currGame", currGame);
+    setGame(currGame);
+    setCurrentFen(currGame.fen());
   }, []);
 
   function showSolution() {
@@ -52,28 +65,29 @@ export default function Solve({ params }: { params: { id: string } }) {
     }
   }, []);
 
-  // Dynamic import for Chessboard component
-  const Chessboard = React.lazy(() => import("chessboardjsx"));
-
   function onDrop({ sourceSquare, targetSquare }: any) {
-    console.log("onDrop", { sourceSquare, targetSquare });
-
-    const expGame = game;
-
-    console.log(expGame);
+    if (!game || !data) {
+      return;
+    }
 
     try {
-      let move = expGame?.move({
+      game.move({
         from: sourceSquare,
         to: targetSquare,
         promotion: "q",
       });
+      if (game.fen() == data.answerFen) {
+        console.log("Correct move", game.fen());
+        setCurrentFen(game.fen());
+      } else {
+        console.log("Incorrect move");
+        setGame(new Chess(data.questionFen));
+        setTries(tries + 1);
+      }
     } catch (error) {
       console.error("Invalid move ARG", error);
       setTries(tries + 1);
     }
-
-    console.log(expGame);
   }
 
   return (
@@ -98,21 +112,17 @@ export default function Solve({ params }: { params: { id: string } }) {
         <div ref={divRef} style={{ width: "100%", height: "100%" }}>
           {/* Conditional rendering of Chessboard component */}
           {typeof window !== "undefined" && (
-            <React.Suspense fallback={<div>Loading...</div>}>
-              <Chessboard
-                width={width}
-                position={data?.questionFen}
-                onDrop={onDrop}
-              />
-            </React.Suspense>
+            <SolveChessboard
+              width={width}
+              currentFen={currentFen}
+              onDrop={onDrop}
+            />
           )}
         </div>
       </div>
 
       <div className="flex justify-center items-center border border-gray-300">
-        <div className="p-2">
-          <Timer />
-        </div>
+        <div className="p-2">{seconds}s</div>
       </div>
 
       <div className="flex justify-center items-center border border-gray-300 row-span-2">
@@ -125,7 +135,7 @@ export default function Solve({ params }: { params: { id: string } }) {
 
       <div className="flex justify-center items-center border border-gray-300">
         <div className="m-4">
-          <Button text="Show me the solution" action={showSolution} />
+          <Button width={2} text="Show me the solution" action={showSolution} />
         </div>
       </div>
 
