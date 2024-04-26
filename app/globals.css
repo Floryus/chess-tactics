@@ -22,6 +22,19 @@ body {
   font-family: "Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, Segoe UI Symbol, Android Emoji, EmojiSymbols" ;
 }
 
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); 
+  border: 1px solid #ddd; 
+  margin: 25px;
+}
+
+.grid-item {
+  padding: 20px;
+  text-align: left;
+  border: 1px solid #ddd; 
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
