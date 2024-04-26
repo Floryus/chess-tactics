@@ -1,34 +1,36 @@
 "use client";
 
-import { loadTactic } from "@/app/http";
+import { listTactics } from "@/app/http";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { Tactic } from "@/app/types";
+import Tags from "@/components/Tags";
 
 export default function Browse() {
+  const userId = useUser().user?.id;
 
-const userId = useUser().user?.id;
+  const [data, setData] = useState<Tactic[]>();
 
-const [data, setData] = useState<Tactic[]>();
-
-useEffect(() => {
+  useEffect(() => {
     // Load the puzzle
-    if(userId){
-      console.log("User id found"+userId);
-      console.log(loadTactic(userId));
-      const data = loadTactic(userId);
-      data.then((result) => {setData(result)});
+    if (userId) {
+      console.log("User id found" + userId);
+      console.log(listTactics(userId));
+      const data = listTactics(userId);
+      data.then((result) => {
+        setData(result);
+      });
+    } else {
+      console.log("No user id found");
     }
-    else{
-      console.log("No user id found")}
-}, [userId]);
+  }, [userId]);
 
   return (
     <div className="grid-container">
-      <div className="grid-item" style={{ gridColumn: "span 2" }}>Browse your Tactics Repetoire</div>
-      <div className="grid-item" style={{ gridColumn: "4" }}>
-        Select a Tag
+      <div className="grid-item" style={{ gridColumn: "span 4" }}>
+        Browse your Tactics Repetoire
       </div>
+
       <div className="grid-item">Id</div>
       <div className="grid-item">Last seen</div>
       <div className="grid-item">Due in</div>
@@ -36,13 +38,15 @@ useEffect(() => {
       {data?.map((tactic) => {
         return (
           <>
-            <div className="grid-item" key={tactic.id}>{tactic.id}</div>
+            <div className="grid-item" key={tactic.id}>
+              {tactic.id}
+            </div>
             <div className="grid-item">{tactic.created_at}</div>
-            <div className="grid-item">{tactic.answerFen}</div>
-            <div className="grid-item">{tactic.questionFen}</div>
+            <div className="grid-item">3 days</div>
+            <div className="grid-item">{tactic.tag} </div>
           </>
-        
         );
       })}
     </div>
-  );}
+  );
+}

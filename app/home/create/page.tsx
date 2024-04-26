@@ -1,6 +1,6 @@
 "use client";
 
-import { loadTactic } from "@/app/http";
+import { saveTactic } from "@/app/http";
 import {
   PositionObject,
   Tactic,
@@ -8,15 +8,17 @@ import {
   startPosition,
 } from "@/app/types";
 import Actions from "@/components/Actions";
-import Button from "@/components/Button";
+import AnswerChessboard from "@/components/AnswerChessboard";
 import CreateChessboard from "@/components/CreateChessboard";
-import FadingText from "@/components/FadingText";
-import SolveChessboard from "@/components/SolveChessboard";
+import Difficulties from "@/components/Difficulties";
 import Tags from "@/components/Tags";
+import { useUser } from "@clerk/nextjs";
 import { Chess } from "chess.js";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Create() {
+  const userId = useUser().user?.id;
+
   const [value, setValue] = useState("");
   const [game, setGame] = useState<Chess>();
 
@@ -27,6 +29,12 @@ export default function Create() {
 
   const [errorString, setErrorString] = useState("");
   const [tag, setTag] = useState("");
+  const [difficulty, setDifficulty] = useState("Easy");
+
+  const [creationStep, setCreationStep] = useState(0);
+  const [questionFen, setQuestionFen] = useState("");
+  const [solutionFen, setSolutionFen] = useState("");
+  const [answerFen, setAnswerFen] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
@@ -36,7 +44,7 @@ export default function Create() {
     console.log("Apply input", value);
   };
 
-  function savePuzzle() {
+  function saveFirstStep() {
     let fen = "";
     if (whiteMoves) {
       fen = getPositionFEN(position, "w");
@@ -45,8 +53,12 @@ export default function Create() {
     }
     console.log("savePuzzle", fen);
     try {
-      new Chess(fen);
+      const riddle = new Chess(fen);
       setErrorString("");
+      console.log(riddle.fen());
+      setQuestionFen(riddle.fen());
+      setSolutionFen(riddle.fen());
+      setCreationStep(1);
     } catch (error) {
       if (error instanceof Error) {
         console.log("Error", error.message);
@@ -55,6 +67,38 @@ export default function Create() {
         }
       }
     }
+  }
+
+  function saveSecondStep() {
+    if (questionFen == answerFen) {
+      setErrorString("Invalid tactic");
+      return;
+    }
+    console.log("Save tactic", questionFen, answerFen, tag);
+
+    if (!userId) {
+      return;
+    }
+    if (
+      difficulty != "Easy" &&
+      difficulty != "Intermediate" &&
+      difficulty != "Hard"
+    ) {
+      return;
+    }
+
+    const newTactic: Tactic = {
+      id: "", // db will generate id
+      title: "New tactic",
+      questionFen: questionFen,
+      answerFen: answerFen,
+      difficulty_level: difficulty,
+      tag: tag,
+      created_by: userId,
+      created_at: "", //db will generate timestamp
+    };
+
+    saveTactic(newTactic);
   }
 
   const [width, setWidth] = useState(0);
@@ -83,7 +127,7 @@ export default function Create() {
     setGame(new Chess());
   }, []);
 
-  function onDrop({ sourceSquare, targetSquare, piece }: any) {
+  function onDropCreate({ sourceSquare, targetSquare, piece }: any) {
     console.log("onDrop", sourceSquare, targetSquare, piece);
     let pos: PositionObject = {};
     if (sourceSquare == "spare") {
@@ -100,6 +144,26 @@ export default function Create() {
     }
     setPosition(pos);
     console.log("position", pos);
+  }
+
+  function onDropAnswer({ sourceSquare, targetSquare }: any) {
+    if (!questionFen) {
+      return;
+    }
+    const setup = new Chess(questionFen);
+    try {
+      setup.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: "q",
+      });
+      console.log("Valid move", setup.fen());
+      setSolutionFen(setup.fen());
+      setAnswerFen(setup.fen());
+    } catch (error) {
+      console.error("Invalid move ARG", error);
+      setErrorString("Invalid move");
+    }
   }
 
   function handleStartPos() {
@@ -158,18 +222,7 @@ export default function Create() {
 
       <div className="flex justify-center items-center border border-gray-300">
         <div className="p-2">
-          <input
-            value={value}
-            onChange={handleInputChange}
-            type="text"
-            className="bg-transparent border border-gray-300 mr-2 px-1"
-          ></input>
-          <button
-            onClick={handleInputApply}
-            className="border border-gray-300 px-2"
-          >
-            +
-          </button>
+          <Difficulties stateTag={setDifficulty} />
         </div>
       </div>
 
@@ -181,12 +234,23 @@ export default function Create() {
         >
           {/* Conditional rendering of Chessboard component */}
           {typeof window !== "undefined" && (
-            <CreateChessboard
-              position={position}
-              width={width}
-              onDrop={onDrop}
-              orientation={orientation}
-            />
+            <>
+              {creationStep === 0 ? (
+                <CreateChessboard
+                  position={position}
+                  width={width}
+                  onDrop={onDropCreate}
+                  orientation={orientation}
+                />
+              ) : (
+                <AnswerChessboard
+                  position={solutionFen}
+                  width={width}
+                  onDrop={onDropAnswer}
+                  orientation={orientation}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
@@ -208,12 +272,21 @@ export default function Create() {
       <div className="flex justify-center items-center border border-gray-300">
         <div className="p-2">
           <div className={` mx-auto  border border-gray-300 py-2 px-2 `}>
-            <button
-              className="text-xl items-center flex justify-center "
-              onClick={savePuzzle}
-            >
-              Save tactic
-            </button>
+            {creationStep === 0 ? (
+              <button
+                className="text-xl items-center flex justify-center "
+                onClick={saveFirstStep}
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                className="text-xl items-center flex justify-center "
+                onClick={saveSecondStep}
+              >
+                Save tactic
+              </button>
+            )}
           </div>
         </div>
       </div>
