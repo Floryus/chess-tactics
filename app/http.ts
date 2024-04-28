@@ -1,20 +1,49 @@
 import { Tactic } from "./types";
 
+export const api = "http://3.72.50.218:8080";
+
 export async function loadTactic(tacticId: string): Promise<Tactic> {
   console.log("load tactic ", tacticId);
+  // API CALL
+  const request: RequestInfo = new Request(api + "/load/" + tacticId, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const respone = await fetch(request);
+  const json = await respone.json();
+  console.log("Response", json);
+
   let answer: Tactic = {
-    id: "abc",
-    title: "Schwerer Springer",
-    questionFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-    answerFen: "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq - 0 1",
-    difficulty_level: "Hard",
-    tag: "Damen-Gambit",
-    created_by: "user_id_abc",
-    created_at: "2024-03-15",
+    id: json.id,
+    title: json.title,
+    questionFen: json.questionFen,
+    answerFen: json.answerFen,
+    difficulty_level: json.difficulty_level,
+    tag: json.tag,
+    created_by: json.created_by,
+    created_at: json.created_at,
   };
-  // TODO: type the response
 
   return answer;
+}
+
+export async function loadNextTactic(userId: string): Promise<String> {
+  // API CALL
+  console.log("Load next tactic for user", userId);
+  const request: RequestInfo = new Request(api + "/loadNextTactic/" + userId, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const response = await fetch(request);
+  const json = await response.json();
+  console.log("Response", json);
+
+  return json;
 }
 
 export async function listTactics(userId: string): Promise<Tactic[]> {
@@ -70,4 +99,40 @@ export async function listTactics(userId: string): Promise<Tactic[]> {
 export async function saveTactic(tactic: Tactic) {
   // API CALL
   console.log("Save tactic to db", tactic);
+  const json = JSON.stringify(tactic);
+  const request: RequestInfo = new Request(api + "/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: json,
+  });
+
+  const response = await fetch(request);
+  console.log("Response", response);
+}
+
+export async function solveTactic(
+  userId: string,
+  time: number,
+  tries: number,
+  solved: boolean,
+  tacticsId: number
+) {
+  // API CALL
+  console.log("Solve tactic", time, tries, solved, tacticsId, userId);
+  const body = await JSON.stringify({ time, tries, solved, tacticsId, userId });
+  console.log("Body", body);
+
+  const request: RequestInfo = new Request(api + "/updateCard", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: body,
+  });
+
+  const response = await fetch(request);
+  const json = await response.json();
+  console.log("Response", json);
 }

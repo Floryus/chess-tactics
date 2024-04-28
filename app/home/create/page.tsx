@@ -14,10 +14,12 @@ import Difficulties from "@/components/Difficulties";
 import Tags from "@/components/Tags";
 import { useUser } from "@clerk/nextjs";
 import { Chess } from "chess.js";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Create() {
   const userId = useUser().user?.id;
+  const router = useRouter();
 
   const [value, setValue] = useState("");
   const [game, setGame] = useState<Chess>();
@@ -99,6 +101,7 @@ export default function Create() {
     };
 
     saveTactic(newTactic);
+    router.push("/home");
   }
 
   const [width, setWidth] = useState(0);

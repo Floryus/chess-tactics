@@ -1,14 +1,19 @@
 "use client";
 
-import { loadTactic } from "@/app/http";
+import { loadNextTactic, loadTactic, solveTactic } from "@/app/http";
 import { Tactic } from "@/app/types";
 import Button from "@/components/Button";
 import FadingText from "@/components/FadingText";
 import SolveChessboard from "@/components/SolveChessboard";
+import { useUser } from "@clerk/nextjs";
 import { Chess } from "chess.js";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Solve({ params }: { params: { id: string } }) {
+  const userId = useUser().user?.id;
+  const router = useRouter();
+
   const [data, setData] = useState<Tactic>();
   const [game, setGame] = useState<Chess>();
 
@@ -33,12 +38,14 @@ export default function Solve({ params }: { params: { id: string } }) {
     const res = loadTactic(params.id);
     console.log(res);
     res.then((data) => setData(data));
+  }, []);
 
+  useEffect(() => {
     const currGame = new Chess(data?.questionFen);
     console.log("currGame", currGame);
     setGame(currGame);
     setCurrentFen(currGame.fen());
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     setFadingText(tries);
@@ -52,8 +59,20 @@ export default function Solve({ params }: { params: { id: string } }) {
     setCurrentFen(data?.answerFen);
   }
 
-  function showNextPuzzle() {
+  async function showNextPuzzle() {
+    if (!userId || !data) {
+      return;
+    }
+
+    solveTactic(userId, seconds, tries, solved, Number(data?.id));
     console.log("show next puzzle");
+    if (!userId) {
+      console.log("startLearing: no user id");
+      return;
+    }
+    const nextTactic = await loadNextTactic(userId);
+    console.log("next tactic", nextTactic);
+    router.push("/home/solve/" + nextTactic);
   }
 
   const [width, setWidth] = useState(0);

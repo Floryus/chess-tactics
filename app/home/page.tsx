@@ -6,9 +6,21 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { loadNextTactic } from "../http";
 
 export default function Home() {
   const router = useRouter();
+  const userId = useUser().user?.id;
+
+  async function startLearning() {
+    if (!userId) {
+      console.log("startLearing: no user id");
+      return;
+    }
+    const tactidId = await loadNextTactic(userId);
+    console.log("next tactic", tactidId);
+    router.push("/home/solve/" + tactidId);
+  }
 
   return (
     <div className="grid grid-cols-2 border border-gray-300 m-10 w-full">
@@ -33,7 +45,7 @@ export default function Home() {
           <Button
             text="Solve Tactics"
             action={() => {
-              router.push("/home/solve");
+              startLearning();
             }}
           />
         </div>
