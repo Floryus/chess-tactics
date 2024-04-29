@@ -1,6 +1,6 @@
 import { Tactic } from "./types";
 
-export const api = "http://3.72.50.218:8080";
+export const api = "http://3.79.232.56:8080";
 
 export async function loadTactic(tacticId: string): Promise<Tactic> {
   console.log("load tactic ", tacticId);
